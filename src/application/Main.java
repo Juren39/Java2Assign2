@@ -11,9 +11,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getClassLoader().getResource("mainUI.fxml"));
+            fxmlLoader.setLocation(getClass().getClassLoader().getResource("Select.fxml"));
             Pane root = fxmlLoader.load();
-            primaryStage.setTitle("Tic Tac Toe");
+            primaryStage.setTitle("Welcome");
             primaryStage.setScene(new Scene(root));
             primaryStage.setResizable(false);
             primaryStage.show();

@@ -1,5 +1,6 @@
 package application.controller;
 
+import application.Main;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,7 +13,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +30,7 @@ public class Controller implements Initializable {
 
     @FXML
     private Pane base_square;
+
     @FXML
     private Rectangle game_panel;
 
@@ -139,51 +143,66 @@ public class Controller implements Initializable {
         line_b.setStroke(Color.BLUE);
         flag[i][j] = true;
     }
-    private void refreshGame() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+
+    private void refreshgame() {
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
                 flag[i][j] = false;
             }
         }
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
                 chessBoard[i][j] = EMPTY;
             }
         }
         TURN = false;
     }
+
     @FXML
     protected void onHelloButtonClick() {
         DialogPane dialog = new DialogPane();
         dialog.setHeaderText("有玩家胜利！");
         dialog.setContentText("是否继续？");
+
         dialog.getButtonTypes().add(ButtonType.YES);
         dialog.getButtonTypes().add(ButtonType.NO);
-        Stage stageAlert = new Stage();
-        Scene sceneAlert = new Scene(dialog);
-        stageAlert.setScene(sceneAlert);
+        dialog.getButtonTypes().add(ButtonType.CLOSE);
+
+        Stage dialogStage = new Stage();
+        Scene dialogScene = new Scene(dialog);
+        dialogStage.setScene(dialogScene);
+
         Button close = (Button)dialog.lookupButton(ButtonType.NO);
         close.setOnAction(event -> {
-
+            Stage stage = (Stage) base_square.getScene().getWindow();
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getClassLoader().getResource("Select.fxml"));
+            Alert(dialogStage, stage, fxmlLoader);
         });
+
         Button apply = (Button)dialog.lookupButton(ButtonType.YES);
         apply.setOnAction(event -> {
-            Stage stageGame = (Stage) base_square.getScene().getWindow();
+            Stage stage = (Stage) base_square.getScene().getWindow();
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getClassLoader().getResource("mainUI.fxml"));
-            Pane root;
-            try {
-                root = fxmlLoader.load();
-                refreshGame();
-                stageGame.setTitle("Tic Tac Toe");
-                stageGame.setScene(new Scene(root));
-                stageGame.setResizable(false);
-                stageGame.show();
-                stageAlert.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Alert(dialogStage, stage, fxmlLoader);
         });
-        stageAlert.show();
+
+        dialogStage.show();
+    }
+
+    private void Alert(Stage dialogStage, Stage stage, FXMLLoader fxmlLoader) {
+        Pane root;
+        try {
+            root = fxmlLoader.load();
+            stage.setTitle("Tic Tac Toe");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            refreshgame();
+            dialogStage.close();
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
