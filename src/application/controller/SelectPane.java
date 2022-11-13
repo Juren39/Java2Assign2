@@ -8,14 +8,14 @@ import javafx.scene.layout.VBox;
 
 
 public class SelectPane {
-    private AnchorPane pane = new AnchorPane();
-    private VBox allbox = new VBox();
-    private HBox infobox = new HBox();
-    private TextField textField = new TextField();
-    private Button button_1 = new Button();
-    private Button button_2 = new Button();
-    private double prefHeight = 400.0;
-    private double prefWidth = 600.0;
+    private final AnchorPane pane = new AnchorPane();
+    private final VBox allbox = new VBox();
+    private final HBox infobox = new HBox();
+    private final TextField textField = new TextField();
+    private final Button button_1 = new Button();
+    private final Button button_2 = new Button();
+    private final double prefHeight = 400.0;
+    private final double prefWidth = 600.0;
 
     public VBox getAllbox() {
         return allbox;

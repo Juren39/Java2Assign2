@@ -3,6 +3,7 @@ package application.controller;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -12,19 +13,17 @@ import java.util.Arrays;
 
 
 public class LisenerController extends Thread {
-
-    private SelectController selectController;
-    private Controller controller = new Controller();
+    private final Controller controller = new Controller();
+    private final Socket socket;
     private static final int BOUND = 90;
-    private static final int OFFSET = 15;
     private static final int EMPTY = 0;
     private static boolean TURN = false;
-    private Socket socket;
-    private String name;
+    private final String name;
     private DataInputStream dataInputStream;
     private PrintStream printStream;
     private static final int PLAY_1 = 1;
     private static final int PLAY_2 = 2;
+    private boolean flag = true;
 
     public Controller getController() {
         return controller;
@@ -38,8 +37,9 @@ public class LisenerController extends Thread {
 
     public LisenerController(Socket socket, String name) {
         controller.draw();
-        this.socket = socket;
+        controller.getButtonQuit().setOnMouseClicked(e -> disconnect());
         this.name = name;
+        this.socket = socket;
         if (socket != null){
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
@@ -52,67 +52,100 @@ public class LisenerController extends Thread {
 
     public void run() {
         String line = null;
-        while (true){
+        while (flag){
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            assert line != null;
-            String[] strs = line.split(":");
-            System.out.println(Arrays.toString(strs));
-            if (strs[0].equals("MATCHWITH")){
-                String otherName = strs[1];
-                String order = strs[2];
-                controller.setRivalName(otherName);
-                if (order.equals("0")) { //first move
-                    controller.getLabelOrder().setText("It's Your Turn");
-                    TURN = true;
-                    move();
+            if (line != null) {
+                String[] strs = line.split(":");
+                System.out.println(Arrays.toString(strs));
+                if (strs[0].equals("MATCHWITH")){
+                    String otherName = strs[1];
+                    String order = strs[2];
+                    controller.setRivalName(otherName);
+                    if (order.equals("0")) { //first move
+                        controller.getLabelOrder().setText("It's Your Turn");
+                        TURN = true;
+                        move();
+                    }
+                    else if (order.equals("1")){
+                        controller.getLabelOrder().setText("It's Rival Turn");
+                        TURN = false;
+                    }
                 }
-                else if (order.equals("1")){
-                    controller.getLabelOrder().setText("It's Rival Turn");
-                    TURN = false;
-                }
-            }
-            else if (strs[0].equals("LUOZI")){
-                int i = Integer.parseInt(strs[1]);
-                int j = Integer.parseInt(strs[2]);
-                if (refreshRival(i, j)) {
-                    if (isGameOver(TURN ? PLAY_2 : PLAY_1)) {
-                        try {
-                            AlertClick(1);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
+                else if (strs[0].equals("LUOZI")){
+                    int i = Integer.parseInt(strs[1]);
+                    int j = Integer.parseInt(strs[2]);
+                    if (refreshRival(i, j)) {
+                        if (isGameOver(TURN ? PLAY_2 : PLAY_1)) {
+                            try {
+                                AlertClick(1);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else {
+                            move();
                         }
+                    }
+                }
+                else if (strs[0].equals("RESTART")) {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String turn = strs[1];
+                    if (turn.equals("rival")) {
+                        TURN = false;
+                        Platform.runLater(() ->{
+                            controller.refreshGame();
+                            controller.getLabelOrder().setText("It's Rival Turn");
+                        });
                     } else {
+                        TURN = true;
+                        Platform.runLater(() ->{
+                            controller.refreshGame();
+                            controller.getLabelOrder().setText("It's Your Turn");
+                        });
                         move();
                     }
                 }
-            }
-            else if (strs[0].equals("RESTART")) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                String turn = strs[1];
-                if (turn.equals("rival")) {
-                    TURN = false;
-                    Platform.runLater(() ->{
-                        controller.refreshGame();
-                        controller.getLabelOrder().setText("It's Rival Turn");
+                else if (strs[0].equals("DISCONNECT")) {
+                    Platform.runLater(() -> {
+                        controller.getLabelOrder().setText("Gamer Quit");
+
                     });
-                } else {
-                    TURN = true;
-                    Platform.runLater(() ->{
-                        controller.refreshGame();
-                        controller.getLabelOrder().setText("It's Your Turn");
-                    });
-                    move();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        close();
+                        Platform.runLater(() -> {
+                            SelectController selectController = new SelectController();
+                            Stage stage = (Stage) controller.getGamebox().getScene().getWindow();
+                            Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
+                                    selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
+                            stage.setScene(scene);
+                            stage.setTitle("连接");
+                            stage.show();
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
+    }
+
+    private void close() throws IOException {
+        socket.close();
+        flag =false;
+        dataInputStream.close();
+        printStream.close();
     }
 
     private void move() {
@@ -216,20 +249,11 @@ public class LisenerController extends Thread {
                 controller.getLabelWin().setText("Tie!");
             });
         }
-        refreshgame();
     }
 
-    private void refreshgame() {
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                controller.setFlag(i, j, false);
-            }
-        }
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                controller.setChessBoard(i, j, EMPTY);
-            }
-        }
-        TURN = false;
+    private void disconnect () {
+        send("QUIT:" + name);
     }
+
+
 }

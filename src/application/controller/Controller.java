@@ -18,88 +18,71 @@ import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.WHITE;
 
 public class Controller{
-    private static final int EMPTY = 0;
     private static final int BOUND = 90;
     private static final int OFFSET = 15;
-    private Pane base_square = new Pane();
-    private Rectangle game_panel = new Rectangle();
-    private AnchorPane pane = new AnchorPane();
-    private static boolean TURN = false;
+    private final Pane base_square = new Pane();
+    private final Rectangle game_panel = new Rectangle();
+    private final AnchorPane pane = new AnchorPane();
+    private static final boolean TURN = false;
     private final int[][] chessBoard = new int[3][3];
-    private final boolean[][] flag = new boolean[3][3];
     private String rivalName;
-    private Label labelOrder = new Label("X's turn to play");
-    private Label labelWin = new Label("No Winner");
-    private VBox gamebox = new VBox();
-    private HBox centerBox = new HBox();
-    private HBox labelBox = new HBox();
-    private double Width = 600;
-    private double Height = 400;
+    private final Label labelOrder = new Label("X's turn to play");
+    private final Label labelWin = new Label("No Winner");
+    private final Button buttonQuit = new Button();
+    private final VBox gamebox = new VBox();
+    private final HBox centerBox = new HBox();
+    private final HBox labelBox = new HBox();
+    private final double Width = 600;
+    private final double Height = 400;
     private Line line_1;
     private Line line_2;
     private Line line_3;
     private Line line_4;
 
-    public double getWidth() {
+    public double getWidth () {
         return Width;
     }
 
-    public double getHeight() {
+    public double getHeight () {
         return Height;
     }
 
-    public int getChessBoard(int i, int j) {
+    public int getChessBoard (int i, int j) {
         return chessBoard[i][j];
     }
 
-    public void setChessBoard(int i, int j, int x) {
+    public void setChessBoard (int i, int j, int x) {
         chessBoard[i][j] = x;
     }
 
-    public boolean getflag(int i, int j) {
-        return flag[i][j];
-    }
-
-    public void setFlag(int i, int j, boolean x) {
-        flag[i][j] = x;
-    }
-
-    public static boolean getTURN() {
-        return TURN;
-    }
-
-    public static void setTURN(boolean x) {
-        TURN = x;
-    }
-
-    public Rectangle getGame_panel() {
+    public Rectangle getGame_panel () {
         return game_panel;
     }
 
-    public Pane getBase_square() {
-        return base_square;
-    }
-
-    public VBox getGamebox() {
+    public VBox getGamebox () {
         return gamebox;
     }
 
-    public Label getLabelOrder() {
+    public Label getLabelOrder () {
         return labelOrder;
     }
 
-    public Label getLabelWin() {
+    public Label getLabelWin () {
         return labelWin;
     }
 
-    public String getRivalName() {
+    public Button getButtonQuit () {
+        return buttonQuit;
+    }
+
+    public String getRivalName () {
         return rivalName;
     }
 
-    public void setRivalName(String x) {
+    public void setRivalName (String x) {
         rivalName = x;
     }
-    public void draw() {
+    public void draw () {
 
         pane.setPrefHeight(Height);
         pane.setPrefWidth(Width);
@@ -126,6 +109,8 @@ public class Controller{
         labelWin.setPrefWidth(150.0);
         labelWin.setPrefHeight(50.0);
         labelWin.setFont(new Font("Cambria", 20));
+
+        buttonQuit.setText("退出游戏");
 
         line_1 = new Line();
         line_1.setEndX(170.0);
@@ -158,12 +143,12 @@ public class Controller{
         labelBox.setAlignment(Pos.CENTER);
         base_square.getChildren().addAll(game_panel, line_1, line_2, line_3, line_4);
         centerBox.getChildren().addAll(base_square);
-        labelBox.getChildren().addAll(labelOrder, labelWin);
+        labelBox.getChildren().addAll(labelOrder, labelWin, buttonQuit);
         gamebox.getChildren().addAll(centerBox, labelBox);
 
     }
 
-    void drawCircle(int i, int j) {
+    void drawCircle (int i, int j) {
         Circle circle = new Circle();
         base_square.getChildren().add(circle);
         circle.setCenterX(i * BOUND + BOUND / 2.0 + OFFSET);
@@ -171,10 +156,9 @@ public class Controller{
         circle.setRadius(BOUND / 2.0 - OFFSET / 2.0);
         circle.setStroke(Color.RED);
         circle.setFill(Color.TRANSPARENT);
-        flag[i][j] = true;
     }
 
-    void drawLine(int i, int j) {
+    void drawLine (int i, int j) {
         Line line_a = new Line();
         Line line_b = new Line();
         base_square.getChildren().add(line_a);
@@ -190,13 +174,17 @@ public class Controller{
         line_b.setEndX(i * BOUND + OFFSET * 1.5);
         line_b.setEndY((j + 1) * BOUND + OFFSET * 0.5);
         line_b.setStroke(Color.BLUE);
-        flag[i][j] = true;
     }
 
-    void refreshGame() {
+    void refreshGame () {
         base_square.getChildren().clear();
         base_square.getChildren().addAll(game_panel, line_1, line_2, line_3, line_4);
         labelWin.setText("No Winner");
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                setChessBoard(i, j, 0);
+            }
+        }
     }
 
 }
