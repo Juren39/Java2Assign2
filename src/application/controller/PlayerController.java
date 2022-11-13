@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -62,34 +61,53 @@ public class PlayerController extends Thread{
                             }
                         }
                     }
-                } else if (strs[0].equals("QUIT")) {
+                } else if (strs[0].equals("GAMERQUIT")) {
                     String name = strs[1];
-                    for (int i = 0; i < players.size(); i++) {
-                        if (i < 0) {
-                            continue;
-                        }
-                        if (players.get(i).getPlayerName().equals(name)) {
+                    for (PlayerController player : players) {
+                        if (player.getPlayerName().equals(name)) {
                             PlayerController player1, player2;
                             for (int j = 0; j < compositions.size(); j++) {
                                 if (compositions.get(j).contains(name)) {
                                     player1 = compositions.get(j).getCircle();
+                                    player1.setStatus(0);
                                     player1.send("DISCONNECT");
-                                    players.remove(player1);
-                                    i--;
                                     player2 = compositions.get(j).getLine();
+                                    player2.setStatus(0);
                                     player2.send("DISCONNECT");
-                                    players.remove(player2);
-                                    i--;
                                     compositions.remove(compositions.get(j));
                                     j--;
                                 }
                             }
                         }
                     }
-                    try {
-                        close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                } else if (strs[0].equals("WANTMATCH")) {
+                    String name = strs[1];
+                    for (PlayerController player : players) {
+                        if (player.getPlayerName().equals(name)) {
+                            player.setStatus(1);
+                        }
+                    }
+                } else if (strs[0].equals("QUITMATCH")) {
+                    String name = strs[1];
+                    for (int j = 0; j < compositions.size(); j++) {
+                        if (compositions.get(j).contains(name)) {
+                            PlayerController player1, player2;
+                            player1 = compositions.get(j).getCircle();
+                            player2 = compositions.get(j).getLine();
+                            player1.send("QUITMATCH");
+                            player2.send("QUITMATCH");
+                            player1.setStatus(0);
+                            player2.setStatus(0);
+                            compositions.remove(compositions.get(j));
+                            j--;
+                        }
+                    }
+                } else if (strs[0].equals("MOVEWRONG")) {
+                    String name = strs[1];
+                    for (PlayerController player : players) {
+                        if (player.getPlayerName().equals(name)) {
+                            player.send("MOVEWRONG");
+                        }
                     }
                 }
             }

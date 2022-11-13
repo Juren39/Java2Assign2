@@ -1,30 +1,22 @@
 package application.controller;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class SelectController {
     private Socket socket = null;
     private PrintStream printStream;
     private boolean isLink = false;
+    private boolean isMatch = false;
     private String name;
     private LisenerController lisenerController;
-    private SelectPane selectPane = new SelectPane();
+    private final SelectPane selectPane = new SelectPane();
 
     public SelectPane getSelectPane() {
         return selectPane;
@@ -33,15 +25,25 @@ public class SelectController {
         return name;
     }
 
+    public void setIsLink(boolean x) {
+        isLink = x;
+    }
+
+    public void setIsMatch(boolean x) {
+        isMatch = x;
+    }
+
     public SelectController() {
         selectPane.draw();
-        selectPane.getButton_1().setOnMouseClicked(e->linkStart());
-        selectPane.getButton_2().setOnMouseClicked(e->playStart());
+        selectPane.getButtonLink().setOnMouseClicked(e->linkStart());
+        selectPane.getButtonMatch().setOnMouseClicked(e->matchStart());
+        selectPane.getButtonGame().setOnMouseClicked(e->playStart());
+        selectPane.getQuitMatch().setOnMouseClicked(e->quitMatch());
     }
 
     private void playStart() {
-        if(isLink) {
-            Stage stage = (Stage) selectPane.getButton_2().getScene().getWindow();
+        if (isLink && isMatch) {
+            Stage stage = (Stage) selectPane.getButtonGame().getScene().getWindow();
             Scene scene = new Scene(lisenerController.getController().getGamebox(),
                     lisenerController.getController().getWidth(), lisenerController.getController().getHeight());
             scene.setFill(Color.TRANSPARENT);
@@ -52,18 +54,28 @@ public class SelectController {
         }
     }
 
+    private void matchStart() {
+        if (isLink) {
+            send("WANTMATCH:" + name);
+        }
+    }
+
+    private void quitMatch() {
+        if (isLink && isMatch) {
+            send("QUITMATCH:" + name);
+        }
+    }
 
     private void linkStart() {
-        name = selectPane.getTextField().getText();
         if(socket == null) {
             try {
+                name = selectPane.getTextField().getText();
                 socket = new Socket(InetAddress.getLocalHost(), 8888);
                 System.out.println(socket);
                 printStream =new PrintStream(socket.getOutputStream());
                 send("LINK:" + name);
-                lisenerController = new LisenerController(socket, name);
+                lisenerController = new LisenerController(socket, name, this);
                 lisenerController.start();
-                isLink = true;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

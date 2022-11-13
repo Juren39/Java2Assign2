@@ -44,7 +44,7 @@ public class ServerController {
                 synchronized (new Link(serverController)) {
                     players.add(player);
                 }
-                player.send("LINK:SUCCESS");
+                player.send("LINKSUCCESS");
                 player.start();
             }
         }
@@ -57,21 +57,21 @@ public class ServerController {
                 PlayerController circle = null;
                 synchronized (new Separate()){
                     for (PlayerController player : players){
-                        if (player.getStatus() == 0){
+                        if (player.getStatus() == 1){
                             line = player;
                             break;
                         }
                     }
                     for (PlayerController player : players){
-                        if (player.getStatus() == 0 && player != line){
+                        if (player.getStatus() == 1 && player != line){
                             circle = player;
                             break;
                         }
                     }
                 }
                 if (line != null && circle != null){
-                    line.setStatus(1);
-                    circle.setStatus(1);
+                    line.setStatus(2);
+                    circle.setStatus(2);
                     Composition composition = new Composition(circle, line);
                     compositions.add(composition);
                     line.send("MATCHWITH:" + circle.getPlayerName() + ":0");
