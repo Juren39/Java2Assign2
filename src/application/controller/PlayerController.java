@@ -62,35 +62,24 @@ public class PlayerController extends Thread{
                         }
                     }
                 } else if (strs[0].equals("GAMERQUIT")) {
-                    String name = strs[1];
-                    for (PlayerController player : players) {
-                        if (player.getPlayerName().equals(name)) {
-                            PlayerController player1, player2;
-                            for (int j = 0; j < compositions.size(); j++) {
-                                if (compositions.get(j).contains(name)) {
-                                    player1 = compositions.get(j).getCircle();
-                                    player1.setStatus(0);
-                                    player1.send("DISCONNECT");
-                                    player2 = compositions.get(j).getLine();
-                                    player2.setStatus(0);
-                                    player2.send("DISCONNECT");
-                                    compositions.remove(compositions.get(j));
-                                    j--;
-                                }
-                            }
+                    PlayerController player1, player2;
+                    for (int j = 0; j < compositions.size(); j++) {
+                        if (compositions.get(j).contains(playerName)) {
+                            player1 = compositions.get(j).getCircle();
+                            player1.setStatus(0);
+                            player1.send("DISCONNECT");
+                            player2 = compositions.get(j).getLine();
+                            player2.setStatus(0);
+                            player2.send("DISCONNECT");
+                            compositions.remove(compositions.get(j));
+                            j--;
                         }
                     }
                 } else if (strs[0].equals("WANTMATCH")) {
-                    String name = strs[1];
-                    for (PlayerController player : players) {
-                        if (player.getPlayerName().equals(name)) {
-                            player.setStatus(1);
-                        }
-                    }
+                    setStatus(1);
                 } else if (strs[0].equals("QUITMATCH")) {
-                    String name = strs[1];
                     for (int j = 0; j < compositions.size(); j++) {
-                        if (compositions.get(j).contains(name)) {
+                        if (compositions.get(j).contains(playerName)) {
                             PlayerController player1, player2;
                             player1 = compositions.get(j).getCircle();
                             player2 = compositions.get(j).getLine();
@@ -103,12 +92,7 @@ public class PlayerController extends Thread{
                         }
                     }
                 } else if (strs[0].equals("MOVEWRONG")) {
-                    String name = strs[1];
-                    for (PlayerController player : players) {
-                        if (player.getPlayerName().equals(name)) {
-                            player.send("MOVEWRONG");
-                        }
-                    }
+                    send("MOVEWRONG");
                 }
             }
         }

@@ -269,6 +269,6 @@ public class LisenerController extends Thread {
     }
 
     private void disconnect () {
-        send("GAMERQUIT:" + name);
+        send("GAMERQUIT:");
     }
 }

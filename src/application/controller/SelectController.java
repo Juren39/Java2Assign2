@@ -56,13 +56,13 @@ public class SelectController {
 
     private void matchStart() {
         if (isLink) {
-            send("WANTMATCH:" + name);
+            send("WANTMATCH");
         }
     }
 
     private void quitMatch() {
         if (isLink && isMatch) {
-            send("QUITMATCH:" + name);
+            send("QUITMATCH");
         }
     }
 
