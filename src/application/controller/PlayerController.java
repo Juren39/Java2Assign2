@@ -36,7 +36,11 @@ public class PlayerController extends Thread{
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
             if (line != null) {
                 String[] strs = line.split(":");
@@ -63,45 +67,81 @@ public class PlayerController extends Thread{
                     }
                 } else if (strs[0].equals("GAMERQUIT")) {
                     PlayerController player1, player2;
-                    for (int j = 0; j < compositions.size(); j++) {
-                        if (compositions.get(j).contains(playerName)) {
-                            player1 = compositions.get(j).getCircle();
-                            player1.setStatus(0);
-                            player1.send("DISCONNECT");
-                            player2 = compositions.get(j).getLine();
-                            player2.setStatus(0);
-                            player2.send("DISCONNECT");
-                            compositions.remove(compositions.get(j));
-                            j--;
+                    synchronized ("aaaa") {
+                        for (int j = 0; j < compositions.size(); j++) {
+                            if (compositions.get(j).contains(playerName)) {
+                                player1 = compositions.get(j).getCircle();
+                                player1.setStatus(0);
+                                player1.send("DISCONNECT");
+                                player2 = compositions.get(j).getLine();
+                                player2.setStatus(0);
+                                player2.send("DISCONNECT");
+                                compositions.remove(compositions.get(j));
+                                j--;
+                            }
                         }
                     }
                 } else if (strs[0].equals("WANTMATCH")) {
                     setStatus(1);
                 } else if (strs[0].equals("QUITMATCH")) {
-                    for (int j = 0; j < compositions.size(); j++) {
-                        if (compositions.get(j).contains(playerName)) {
-                            PlayerController player1, player2;
-                            player1 = compositions.get(j).getCircle();
-                            player2 = compositions.get(j).getLine();
-                            player1.send("QUITMATCH");
-                            player2.send("QUITMATCH");
-                            player1.setStatus(0);
-                            player2.setStatus(0);
-                            compositions.remove(compositions.get(j));
-                            j--;
+                    synchronized ("aaaa") {
+                        for (int j = 0; j < compositions.size(); j++) {
+                            if (compositions.get(j).contains(playerName)) {
+                                PlayerController player1, player2;
+                                player1 = compositions.get(j).getCircle();
+                                player2 = compositions.get(j).getLine();
+                                player1.send("QUITMATCH");
+                                player2.send("QUITMATCH");
+                                player1.setStatus(0);
+                                player2.setStatus(0);
+                                compositions.remove(compositions.get(j));
+                                j--;
+                            }
                         }
                     }
                 } else if (strs[0].equals("MOVEWRONG")) {
                     send("MOVEWRONG");
+                } else if (strs[0].equals("QUITGAME")) {
+                    try {
+                        send("QUITGAME");
+                        close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 }
             }
         }
     }
     private void close() throws IOException {
-        socket.close();
+        synchronized ("aaaa") {
+            for (int j = 0; j < compositions.size(); j++) {
+                if (compositions.get(j).contains(playerName)) {
+                    PlayerController player1, player2;
+                    player1 = compositions.get(j).getCircle();
+                    player2 = compositions.get(j).getLine();
+                    if (player1.getPlayerName().equals(playerName)) {
+                        player2.send("QUITMATCH");
+                        player2.setStatus(0);
+                    } else {
+                        player1.send("QUITMATCH");
+                        player1.setStatus(0);
+                    }
+                    compositions.remove(compositions.get(j));
+                    j--;
+                }
+            }
+            for (int j = 0; j < players.size(); j++) {
+                if (players.get(j).getPlayerName().equals(playerName)) {
+                    players.remove(players.get(j));
+                    j--;
+                }
+            }
+        }
         flag = false;
         printstream.close();
         dataInputStream.close();
+        socket.close();
     }
 
     public PlayerController(Socket socket, List<PlayerController> players, List<Composition> compositions) {

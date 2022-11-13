@@ -41,7 +41,7 @@ public class ServerController {
                     e.printStackTrace();
                 }
                 PlayerController player = new PlayerController(socket, players, compositions);
-                synchronized (new Link(serverController)) {
+                synchronized ("aaaa") {
                     players.add(player);
                 }
                 player.send("LINKSUCCESS");
@@ -55,7 +55,7 @@ public class ServerController {
             while (true){
                 PlayerController line = null;
                 PlayerController circle = null;
-                synchronized (new Separate()){
+                synchronized ("aaaa"){
                     for (PlayerController player : players){
                         if (player.getStatus() == 1){
                             line = player;

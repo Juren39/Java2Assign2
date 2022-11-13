@@ -1,9 +1,15 @@
 package application.controller;
 
+import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
@@ -39,6 +45,7 @@ public class SelectController {
         selectPane.getButtonMatch().setOnMouseClicked(e->matchStart());
         selectPane.getButtonGame().setOnMouseClicked(e->playStart());
         selectPane.getQuitMatch().setOnMouseClicked(e->quitMatch());
+        selectPane.getQuitGame().setOnMouseClicked(e->quitGame());
     }
 
     private void playStart() {
@@ -66,6 +73,10 @@ public class SelectController {
         }
     }
 
+    private void quitGame() {
+        send("QUITGAME");
+    }
+
     private void linkStart() {
         if(socket == null) {
             try {
@@ -77,9 +88,30 @@ public class SelectController {
                 lisenerController = new LisenerController(socket, name, this);
                 lisenerController.start();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                AlertLink();
             }
         }
+    }
+
+    @FXML
+    protected void AlertLink() {
+        DialogPane dialog = new DialogPane();
+        dialog.setHeaderText("????????");
+        dialog.setContentText("NO LINKKKKKKKKKKK");
+        dialog.getButtonTypes().add(ButtonType.YES);
+
+        Stage dialogStage = new Stage();
+        Scene dialogScene = new Scene(dialog);
+        dialogStage.setScene(dialogScene);
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.setResizable(false);
+
+        Button yes = (Button)dialog.lookupButton(ButtonType.YES);
+        yes.setOnAction(event -> {
+            dialogStage.close();
+        });
+
+        dialogStage.show();
     }
 
     public void send(String msg) {

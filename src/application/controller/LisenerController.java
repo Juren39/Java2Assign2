@@ -57,7 +57,12 @@ public class LisenerController extends Thread {
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    close();
+                    restart();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
             if (line != null) {
                 String[] strs = line.split(":");
@@ -126,16 +131,7 @@ public class LisenerController extends Thread {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    Platform.runLater(() -> {
-                        selectController = new SelectController();
-                        Stage stage = (Stage) controller.getGamebox().getScene().getWindow();
-                        Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
-                                selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
-                        selectController.setIsMatch(false);
-                        stage.setScene(scene);
-                        stage.setTitle("连接");
-                        stage.show();
-                    });
+                    restart();
                 }
                 else if (strs[0].equals("LINKSUCCESS")) {
                     Platform.runLater(() -> {
@@ -152,15 +148,46 @@ public class LisenerController extends Thread {
                 else if (strs[0].equals("MOVEWRONG")) {
                     move();
                 }
+                else if (strs[0].equals("QUITGAME")) {
+                    try {
+                        close();
+                        Platform.runLater(() -> {
+                            Stage stage = (Stage) selectController.getSelectPane().getButtonGame().getScene().getWindow();
+                            stage.close();
+                            System.exit(0);
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
     }
 
+    private void restart() {
+        Platform.runLater(() -> {
+            selectController = new SelectController();
+            Stage stage;
+            if (controller.getGamebox().getScene().getWindow() == null) {
+                stage = (Stage) selectController.getSelectPane().getButtonGame().getScene().getWindow();
+            } else {
+                stage = (Stage) controller.getGamebox().getScene().getWindow();
+            }
+            Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
+                    selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
+            selectController.getSelectPane().getMatchinfo().setText("No Match");
+            selectController.setIsMatch(false);
+            stage.setScene(scene);
+            stage.setTitle("连接");
+            stage.show();
+        });
+    }
+
     private void close() throws IOException {
-        socket.close();
         flag = false;
         dataInputStream.close();
         printStream.close();
+        socket.close();
     }
 
     private void move() {
@@ -269,6 +296,6 @@ public class LisenerController extends Thread {
     }
 
     private void disconnect () {
-        send("GAMERQUIT:");
+        send("GAMERQUIT");
     }
 }

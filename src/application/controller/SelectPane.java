@@ -18,6 +18,7 @@ public class SelectPane {
     private final Label matchinfo = new Label();
     private final Button buttonLink = new Button();
     private final Button buttonGame = new Button();
+    private final Button quitGame = new Button();
     private final Button buttonMatch = new Button();
     private final Button quitMatch = new Button();
     private final double prefHeight = 400.0;
@@ -41,6 +42,10 @@ public class SelectPane {
 
     public Button getButtonGame() {
         return buttonGame;
+    }
+
+    public Button getQuitGame() {
+        return quitGame;
     }
 
     public Button getButtonMatch() {
@@ -71,13 +76,14 @@ public class SelectPane {
         buttonMatch.setText("开始匹配");
         quitMatch.setText("退出匹配");
         buttonGame.setText("开始游戏");
+        quitGame.setText("退出游戏");
 
         linkinfo.setText("No link");
         matchinfo.setText("No match");
 
         infobox.getChildren().addAll(buttonLink, textField, linkinfo);
         matchbox.getChildren().addAll(buttonMatch, quitMatch, matchinfo);
-        allbox.getChildren().addAll(infobox, matchbox, buttonGame);
+        allbox.getChildren().addAll(infobox, matchbox, buttonGame, quitGame);
     }
 
 }
