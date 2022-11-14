@@ -24,6 +24,7 @@ public class LisenerController extends Thread {
     private static final int PLAY_1 = 1;
     private static final int PLAY_2 = 2;
     private boolean flag = true;
+    private int isTie = 0;
 
     public Controller getController() {
         return controller;
@@ -89,15 +90,12 @@ public class LisenerController extends Thread {
                     int i = Integer.parseInt(strs[1]);
                     int j = Integer.parseInt(strs[2]);
                     if (refreshRival(i, j)) {
-                        if (isGameOver(TURN ? PLAY_2 : PLAY_1)) {
-                            try {
-                                AlertClick(1);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            move();
+                        try {
+                            isGameOver(TURN ? PLAY_2 : PLAY_1);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
+                        move();
                     }
                 }
                 else if (strs[0].equals("RESTART")) {
@@ -141,7 +139,11 @@ public class LisenerController extends Thread {
                 }
                 else if (strs[0].equals("QUITMATCH")) {
                     Platform.runLater(() -> {
-                        selectController.getSelectPane().getMatchinfo().setText("No Match");
+                        if (selectController.getIsGame()) {
+                            restart();
+                        } else {
+                            selectController.getSelectPane().getMatchinfo().setText("No Match");
+                        }
                     });
                     selectController.setIsMatch(false);
                 }
@@ -166,17 +168,18 @@ public class LisenerController extends Thread {
 
     private void restart() {
         Platform.runLater(() -> {
-            selectController = new SelectController();
             Stage stage;
-            if (controller.getGamebox().getScene().getWindow() == null) {
-                stage = (Stage) selectController.getSelectPane().getButtonGame().getScene().getWindow();
-            } else {
+            if (selectController.getIsGame()) {
                 stage = (Stage) controller.getGamebox().getScene().getWindow();
+            } else {
+                stage = (Stage) selectController.getSelectPane().getAllbox().getScene().getWindow();
             }
-            Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
-                    selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
+            selectController = new SelectController();
+            selectController.setIsGame(false);
             selectController.getSelectPane().getMatchinfo().setText("No Match");
             selectController.setIsMatch(false);
+            Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
+                    selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
             stage.setScene(scene);
             stage.setTitle("连接");
             stage.show();
@@ -196,15 +199,13 @@ public class LisenerController extends Thread {
             int y = (int) (event.getY() / BOUND);
             if (refreshYour(x, y)) {
                 send("LUOZI:" + controller.getRivalName() + ":" + x + ":" + y);
-                if (isGameOver(TURN ? PLAY_1 : PLAY_2)) {
-                    try {
-                        AlertClick(0);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                try {
+                    isGameOver(TURN ? PLAY_1 : PLAY_2);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             } else {
-                send("MOVEWRONG:" + name);
+                send("MOVEWRONG");
             }
             controller.getGame_panel().setOnMouseClicked(null);
         });
@@ -244,44 +245,53 @@ public class LisenerController extends Thread {
         return false;
     }
 
-    private boolean isGameOver (int player) {
+    private void isGameOver (int player) throws InterruptedException {
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(i, 0) == player
                     && controller.getChessBoard(i, 1) == player
                     && controller.getChessBoard(i, 2) == player){
-                return true;
+                AlertClick(player);
             }
         }
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(0, i) == player
                     && controller.getChessBoard(1, i) == player
                     && controller.getChessBoard(2, i) == player){
-                return true;
+                AlertClick(player);
             }
         }
         if (controller.getChessBoard(0, 0) == player
                 && controller.getChessBoard(1, 1) == player
                 && controller.getChessBoard(2, 2) == player){
-            return true;
+            AlertClick(player);
         }
         if (controller.getChessBoard(2, 0) == player
                 && controller.getChessBoard(1, 1) == player
                 && controller.getChessBoard(0, 2) == player){
-            return true;
+            AlertClick(player);
         }
-
-        return false;
+        int res = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (controller.getChessBoard(i, j) != EMPTY) {
+                    res++;
+                }
+            }
+        }
+        if (res == 9) {
+            AlertClick(3);
+        }
     }
 
-    protected void AlertClick(int player) throws InterruptedException {
-        //0 means you win, 1 means rival win, 2 means tie.
-        if ((TURN && player == 0) || (!TURN && player == 1)) {
+    protected void AlertClick(int player) {
+        //1 means you win, 2 means rival win, 3 means tie.
+        if ((TURN && player == 1) || (!TURN && player == 2)) {
             send("WINNER:" + name + ":" + TURN);
             Platform.runLater(() -> {
                 controller.getLabelWin().setText("Line Win!");
 
             });
-        } else if ((TURN && player == 1) || (!TURN && player == 0)) {
+        } else if ((TURN && player == 2) || (!TURN && player == 1)) {
             send("WINNER:" + name + ":" + TURN);
             Platform.runLater(() -> {
                 controller.getLabelWin().setText("Circle Win!");

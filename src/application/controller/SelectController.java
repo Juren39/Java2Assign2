@@ -20,6 +20,7 @@ public class SelectController {
     private PrintStream printStream;
     private boolean isLink = false;
     private boolean isMatch = false;
+    private boolean isGame = false;
     private String name;
     private LisenerController lisenerController;
     private final SelectPane selectPane = new SelectPane();
@@ -39,6 +40,14 @@ public class SelectController {
         isMatch = x;
     }
 
+    public void setIsGame(boolean x) {
+        isGame = x;
+    }
+
+    public boolean getIsGame() {
+        return isGame;
+    }
+
     public SelectController() {
         selectPane.draw();
         selectPane.getButtonLink().setOnMouseClicked(e->linkStart());
@@ -50,6 +59,7 @@ public class SelectController {
 
     private void playStart() {
         if (isLink && isMatch) {
+            setIsGame(true);
             Stage stage = (Stage) selectPane.getButtonGame().getScene().getWindow();
             Scene scene = new Scene(lisenerController.getController().getGamebox(),
                     lisenerController.getController().getWidth(), lisenerController.getController().getHeight());
@@ -74,7 +84,13 @@ public class SelectController {
     }
 
     private void quitGame() {
-        send("QUITGAME");
+        if (socket != null) {
+            send("QUITGAME");
+        } else {
+            Stage stage = (Stage) selectPane.getButtonGame().getScene().getWindow();
+            stage.close();
+            System.exit(0);
+        }
     }
 
     private void linkStart() {

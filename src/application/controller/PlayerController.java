@@ -67,7 +67,7 @@ public class PlayerController extends Thread{
                     }
                 } else if (strs[0].equals("GAMERQUIT")) {
                     PlayerController player1, player2;
-                    synchronized ("aaaa") {
+                    synchronized ("bbbb") {
                         for (int j = 0; j < compositions.size(); j++) {
                             if (compositions.get(j).contains(playerName)) {
                                 player1 = compositions.get(j).getCircle();
@@ -84,7 +84,7 @@ public class PlayerController extends Thread{
                 } else if (strs[0].equals("WANTMATCH")) {
                     setStatus(1);
                 } else if (strs[0].equals("QUITMATCH")) {
-                    synchronized ("aaaa") {
+                    synchronized ("bbbb") {
                         for (int j = 0; j < compositions.size(); j++) {
                             if (compositions.get(j).contains(playerName)) {
                                 PlayerController player1, player2;
@@ -114,7 +114,7 @@ public class PlayerController extends Thread{
         }
     }
     private void close() throws IOException {
-        synchronized ("aaaa") {
+        synchronized ("bbbb") {
             for (int j = 0; j < compositions.size(); j++) {
                 if (compositions.get(j).contains(playerName)) {
                     PlayerController player1, player2;
@@ -131,6 +131,8 @@ public class PlayerController extends Thread{
                     j--;
                 }
             }
+        }
+        synchronized ("aaaa") {
             for (int j = 0; j < players.size(); j++) {
                 if (players.get(j).getPlayerName().equals(playerName)) {
                     players.remove(players.get(j));
