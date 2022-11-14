@@ -21,18 +21,14 @@ public class ServerController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Link link = new Link(this);
+        Link link = new Link();
         link.start();
         Separate separate = new Separate();
         separate.start();
     }
 
     private class Link extends Thread {
-        private final ServerController serverController;
 
-        public Link (ServerController serverController) {
-            this.serverController = serverController;
-        }
         public void run() {
             while (true){
                 try {

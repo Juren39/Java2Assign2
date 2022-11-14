@@ -26,6 +26,7 @@ public class Controller{
     private static final boolean TURN = false;
     private final int[][] chessBoard = new int[3][3];
     private String rivalName;
+    private final Label labelyou = new Label("You are");
     private final Label labelOrder = new Label("X's turn to play");
     private final Label labelWin = new Label("No Winner");
     private final Button buttonQuit = new Button();
@@ -71,6 +72,10 @@ public class Controller{
         return labelWin;
     }
 
+    public Label getLabelyou () {
+        return labelyou;
+    }
+
     public Button getButtonQuit () {
         return buttonQuit;
     }
@@ -101,6 +106,10 @@ public class Controller{
         game_panel.setStroke(BLACK);
         game_panel.setStrokeType(StrokeType.INSIDE);
         game_panel.setWidth(270.0);
+
+        labelyou.setPrefWidth(150.0);
+        labelyou.setPrefHeight(50.0);
+        labelyou.setFont(new Font("Cambria", 20));
 
         labelOrder.setPrefWidth(150.0);
         labelOrder.setPrefHeight(50.0);
@@ -143,7 +152,7 @@ public class Controller{
         labelBox.setAlignment(Pos.CENTER);
         base_square.getChildren().addAll(game_panel, line_1, line_2, line_3, line_4);
         centerBox.getChildren().addAll(base_square);
-        labelBox.getChildren().addAll(labelOrder, labelWin, buttonQuit);
+        labelBox.getChildren().addAll(labelyou, labelOrder, labelWin, buttonQuit);
         gamebox.getChildren().addAll(centerBox, labelBox);
 
     }

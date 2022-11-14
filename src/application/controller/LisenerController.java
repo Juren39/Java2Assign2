@@ -77,11 +77,13 @@ public class LisenerController extends Thread {
                     });
                     selectController.setIsMatch(true);
                     if (order.equals("0")) { //first move
+                        controller.getLabelyou().setText("You are Line");
                         controller.getLabelOrder().setText("It's Your Turn");
                         TURN = true;
                         move();
                     }
                     else if (order.equals("1")){
+                        controller.getLabelyou().setText("You are Circle");
                         controller.getLabelOrder().setText("It's Rival Turn");
                         TURN = false;
                     }
@@ -109,12 +111,14 @@ public class LisenerController extends Thread {
                         TURN = false;
                         Platform.runLater(() ->{
                             controller.refreshGame();
+                            controller.getLabelyou().setText("You are Circle");
                             controller.getLabelOrder().setText("It's Rival Turn");
                         });
                     } else {
                         TURN = true;
                         Platform.runLater(() ->{
                             controller.refreshGame();
+                            controller.getLabelyou().setText("You are Line");
                             controller.getLabelOrder().setText("It's Your Turn");
                         });
                         move();
@@ -230,6 +234,7 @@ public class LisenerController extends Thread {
         }
         return false;
     }
+
     private boolean refreshYour(int x, int y) {
         if (controller.getChessBoard(x, y) == EMPTY) {
             if(TURN) {

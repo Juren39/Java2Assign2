@@ -100,9 +100,9 @@ public class SelectController {
                 socket = new Socket(InetAddress.getLocalHost(), 8888);
                 System.out.println(socket);
                 printStream =new PrintStream(socket.getOutputStream());
-                send("LINK:" + name);
                 lisenerController = new LisenerController(socket, name, this);
                 lisenerController.start();
+                send("LINK:" + name);
             } catch (IOException e) {
                 AlertLink();
             }
