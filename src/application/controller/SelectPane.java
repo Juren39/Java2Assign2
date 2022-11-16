@@ -1,5 +1,6 @@
 package application.controller;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -80,6 +81,10 @@ public class SelectPane {
 
         linkinfo.setText("No link");
         matchinfo.setText("No match");
+
+        infobox.setAlignment(Pos.CENTER);
+        matchbox.setAlignment(Pos.CENTER);
+        allbox.setAlignment(Pos.CENTER);
 
         infobox.getChildren().addAll(buttonLink, textField, linkinfo);
         matchbox.getChildren().addAll(buttonMatch, quitMatch, matchinfo);

@@ -30,7 +30,7 @@ public class PlayerController extends Thread{
     }
 
     public void run() {
-        String line = null;
+        String line;
         while(flag) {
             try {
                 line = dataInputStream.readLine();
@@ -66,7 +66,7 @@ public class PlayerController extends Thread{
                         }
                     }
                 } else if (strs[0].equals("GAMERQUIT")) {
-                    PlayerController player1, player2;
+                    PlayerController player1 = null, player2 = null;
                     synchronized ("bbbb") {
                         for (int j = 0; j < compositions.size(); j++) {
                             if (compositions.get(j).contains(playerName)) {
@@ -80,6 +80,10 @@ public class PlayerController extends Thread{
                                 j--;
                             }
                         }
+                    }
+                    synchronized ("aaaa") {
+                        players.remove(player1);
+                        players.remove(player2);
                     }
                 } else if (strs[0].equals("WANTMATCH")) {
                     setStatus(1);
