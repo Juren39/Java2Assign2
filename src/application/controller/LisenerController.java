@@ -24,7 +24,6 @@ public class LisenerController extends Thread {
     private static final int PLAY_1 = 1;
     private static final int PLAY_2 = 2;
     private boolean flag = true;
-    private int isTie = 0;
 
     public Controller getController() {
         return controller;
@@ -91,13 +90,16 @@ public class LisenerController extends Thread {
                 else if (strs[0].equals("LUOZI")) {
                     int i = Integer.parseInt(strs[1]);
                     int j = Integer.parseInt(strs[2]);
+                    boolean vaild = true;
                     if (refreshRival(i, j)) {
                         try {
-                            isGameOver(TURN ? PLAY_2 : PLAY_1);
+                            vaild = isGameOver(TURN ? PLAY_2 : PLAY_1);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        move();
+                        if (!vaild) {
+                            move();
+                        }
                     }
                 }
                 else if (strs[0].equals("RESTART")) {
@@ -214,7 +216,7 @@ public class LisenerController extends Thread {
             if (refreshYour(x, y)) {
                 send("LUOZI:" + controller.getRivalName() + ":" + x + ":" + y);
                 try {
-                    isGameOver(TURN ? PLAY_1 : PLAY_2);
+                    boolean vaild = isGameOver(TURN ? PLAY_1 : PLAY_2);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -260,12 +262,13 @@ public class LisenerController extends Thread {
         return false;
     }
 
-    private void isGameOver (int player) throws InterruptedException {
+    private boolean isGameOver (int player) throws InterruptedException {
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(i, 0) == player
                     && controller.getChessBoard(i, 1) == player
                     && controller.getChessBoard(i, 2) == player){
                 AlertClick(player);
+                return true;
             }
         }
         for (int i = 0; i < 3; i++) {
@@ -273,17 +276,20 @@ public class LisenerController extends Thread {
                     && controller.getChessBoard(1, i) == player
                     && controller.getChessBoard(2, i) == player){
                 AlertClick(player);
+                return true;
             }
         }
         if (controller.getChessBoard(0, 0) == player
                 && controller.getChessBoard(1, 1) == player
                 && controller.getChessBoard(2, 2) == player){
             AlertClick(player);
+            return true;
         }
         if (controller.getChessBoard(2, 0) == player
                 && controller.getChessBoard(1, 1) == player
                 && controller.getChessBoard(0, 2) == player){
             AlertClick(player);
+            return true;
         }
         int res = 0;
         for (int i = 0; i < 3; i++) {
@@ -295,7 +301,9 @@ public class LisenerController extends Thread {
         }
         if (res == 9) {
             AlertClick(3);
+            return true;
         }
+        return false;
     }
 
     protected void AlertClick(int player) {
