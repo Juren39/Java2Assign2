@@ -53,12 +53,13 @@ public class LisenerController extends Thread {
     }
 
     public void run() {
-        String line = null;
+        String line;
         while (flag){
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 try {
+                    line = null;
                     close();
                     restart();
                 } catch (IOException ex) {
@@ -67,7 +68,6 @@ public class LisenerController extends Thread {
             }
             if (line != null) {
                 String[] strs = line.split(":");
-                System.out.println(Arrays.toString(strs));
                 if (strs[0].equals("MATCHWITH")){
                     String otherName = strs[1];
                     String order = strs[2];
@@ -135,11 +135,21 @@ public class LisenerController extends Thread {
                     }
                     restart();
                 }
-                else if (strs[0].equals("LINKSUCCESS")) {
-                    Platform.runLater(() -> {
-                        selectController.getSelectPane().getLinkinfo().setText("Link Success!");
-                    });
-                    selectController.setIsLink(true);
+                else if (strs[0].equals("LINK")) {
+                    String statu = strs[1];
+                    if (statu.equals("ERROR")) {
+                        String error = strs[2];
+                        if(error.equals("SAMENAME")) {
+                            Platform.runLater(() -> {
+                                selectController.getSelectPane().getLinkinfo().setText("Link Error! Same Name!");
+                            });
+                        }
+                    } else if (statu.equals("SUCCESS")) {
+                        Platform.runLater(() -> {
+                            selectController.getSelectPane().getLinkinfo().setText("Link Success!");
+                        });
+                        selectController.setIsLink(true);
+                    }
                 }
                 else if (strs[0].equals("QUITMATCH")) {
                     Platform.runLater(() -> {

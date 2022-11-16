@@ -37,10 +37,6 @@ public class ServerController {
                     e.printStackTrace();
                 }
                 PlayerController player = new PlayerController(socket, players, compositions);
-                synchronized ("aaaa") {
-                    players.add(player);
-                }
-                player.send("LINKSUCCESS");
                 player.start();
             }
         }

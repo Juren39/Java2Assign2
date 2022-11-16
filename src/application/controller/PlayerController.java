@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class PlayerController extends Thread{
     private final Socket socket;
@@ -37,6 +36,7 @@ public class PlayerController extends Thread{
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 try {
+                    line = null;
                     close();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -109,6 +109,22 @@ public class PlayerController extends Thread{
                         throw new RuntimeException(e);
                     }
 
+                } else if (strs[0].equals("LINK")) {
+                    String name = strs[1];
+                    boolean vaild = true;
+                    for (PlayerController playerController : players) {
+                        if (playerController.getPlayerName().equals(name)) {
+                            vaild = false;
+                            send("LINK:ERROR:SAMENAME");
+                        }
+                    }
+                    if (vaild) {
+                        synchronized ("aaaa") {
+                            players.add(this);
+                        }
+                        playerName = name;
+                        send("LINK:SUCCESS");
+                    }
                 }
             }
         }
@@ -153,10 +169,6 @@ public class PlayerController extends Thread{
         try {
             printstream = new PrintStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
-            StringTokenizer st = new StringTokenizer(dataInputStream.readLine(), ":");
-            if (st.nextToken().equalsIgnoreCase("LINK")){
-                this.playerName = st.nextToken();
-            }
             InetAddress ip = socket.getLocalAddress();
         } catch (IOException e) {
             throw new RuntimeException(e);

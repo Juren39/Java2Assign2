@@ -94,11 +94,10 @@ public class SelectController {
     }
 
     private void linkStart() {
-        if(socket == null) {
+        if(socket == null || !isLink) {
             try {
                 name = selectPane.getTextField().getText();
                 socket = new Socket(InetAddress.getLocalHost(), 8888);
-                System.out.println(socket);
                 printStream =new PrintStream(socket.getOutputStream());
                 lisenerController = new LisenerController(socket, name, this);
                 lisenerController.start();
