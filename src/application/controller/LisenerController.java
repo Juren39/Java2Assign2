@@ -1,8 +1,13 @@
 package application.controller;
 
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -60,7 +65,7 @@ public class LisenerController extends Thread {
                 try {
                     line = null;
                     close();
-                    restart();
+                    restart(true);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -135,7 +140,7 @@ public class LisenerController extends Thread {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    restart();
+                    restart(false);
                 }
                 else if (strs[0].equals("LINK")) {
                     String statu = strs[1];
@@ -155,8 +160,13 @@ public class LisenerController extends Thread {
                 }
                 else if (strs[0].equals("QUITMATCH")) {
                     Platform.runLater(() -> {
+                        if(strs.length == 2){
+                            if(strs[1].equals("Rival")){
+                                AlertRival();
+                            }
+                        }
                         if (selectController.getIsGame()) {
-                            restart();
+                            restart(false);
                         } else {
                             selectController.getSelectPane().getMatchinfo().setText("No Match");
                         }
@@ -182,8 +192,49 @@ public class LisenerController extends Thread {
         }
     }
 
-    private void restart() {
+    @FXML
+    protected void AlertRival() {
+        DialogPane dialog = new DialogPane();
+        dialog.setHeaderText("????????");
+        dialog.setContentText("Your Rival Quit!!!!!");
+        dialog.getButtonTypes().add(ButtonType.YES);
+        Stage dialogStage = new Stage();
+        Scene dialogScene = new Scene(dialog);
+        dialogStage.setScene(dialogScene);
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.setResizable(false);
+        Button yes = (Button) dialog.lookupButton(ButtonType.YES);
+        yes.setOnAction(event -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+
+    }
+
+    @FXML
+    protected void AlertServer() {
+        DialogPane dialog = new DialogPane();
+        dialog.setHeaderText("????????");
+        dialog.setContentText("Server Crash!!!!");
+        dialog.getButtonTypes().add(ButtonType.YES);
+        Stage dialogStage = new Stage();
+        Scene dialogScene = new Scene(dialog);
+        dialogStage.setScene(dialogScene);
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.setResizable(false);
+        Button yes = (Button) dialog.lookupButton(ButtonType.YES);
+        yes.setOnAction(event -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+
+    }
+
+    private void restart(boolean Server) {
         Platform.runLater(() -> {
+            if(Server){
+                AlertServer();
+            }
             Stage stage;
             if (selectController.getIsGame()) {
                 stage = (Stage) controller.getGamebox().getScene().getWindow();
@@ -197,7 +248,7 @@ public class LisenerController extends Thread {
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
                     selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
             stage.setScene(scene);
-            stage.setTitle("连接");
+            stage.setTitle("LINK");
             stage.show();
         });
     }

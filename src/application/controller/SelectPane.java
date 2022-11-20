@@ -73,11 +73,11 @@ public class SelectPane {
         pane.setPrefHeight(prefHeight);
         pane.setPrefWidth(prefWidth);
 
-        buttonLink.setText("开始链接");
-        buttonMatch.setText("开始匹配");
-        quitMatch.setText("退出匹配");
-        buttonGame.setText("开始游戏");
-        quitGame.setText("退出游戏");
+        buttonLink.setText("Start Link");
+        buttonMatch.setText("Start Match");
+        quitMatch.setText("Quit Match");
+        buttonGame.setText("Start Game");
+        quitGame.setText("Quit Game");
 
         linkinfo.setText("No link");
         matchinfo.setText("No match");

@@ -134,17 +134,19 @@ public class PlayerController extends Thread{
         }
     }
     private void close() throws IOException {
+        PlayerController player1 = null, player2 = null;
+        boolean isCom = false;
         synchronized ("bbbb") {
             for (int j = 0; j < compositions.size(); j++) {
                 if (compositions.get(j).contains(playerName)) {
-                    PlayerController player1, player2;
+                    isCom = true;
                     player1 = compositions.get(j).getCircle();
                     player2 = compositions.get(j).getLine();
                     if (player1.getPlayerName().equals(playerName)) {
-                        player2.send("QUITMATCH");
+                        player2.send("QUITMATCH:Rival");
                         player2.setStatus(0);
                     } else {
-                        player1.send("QUITMATCH");
+                        player1.send("QUITMATCH:Rival");
                         player1.setStatus(0);
                     }
                     compositions.remove(compositions.get(j));
@@ -153,12 +155,18 @@ public class PlayerController extends Thread{
             }
         }
         synchronized ("aaaa") {
-            for (int j = 0; j < players.size(); j++) {
-                if (players.get(j).getPlayerName().equals(playerName)) {
-                    players.remove(players.get(j));
-                    j--;
+            if(isCom){
+                players.remove(player1);
+                players.remove(player2);
+            }else{
+                for(int i=0;i<players.size();i++){
+                    if(players.get(i).getPlayerName().equals(playerName)){
+                        players.remove(players.get(i));
+                        i--;
+                    }
                 }
             }
+
         }
         flag = false;
         printstream.close();

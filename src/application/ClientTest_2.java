@@ -14,7 +14,7 @@ public class ClientTest_2 extends Application {
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
                     selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
             stage.setScene(scene);
-            stage.setTitle("连接");
+            stage.setTitle("LINK");
             stage.initStyle(StageStyle.UNIFIED);
             stage.show();
         } catch (Exception e) {

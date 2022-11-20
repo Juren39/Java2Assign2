@@ -119,7 +119,7 @@ public class Controller{
         labelWin.setPrefHeight(50.0);
         labelWin.setFont(new Font("Cambria", 20));
 
-        buttonQuit.setText("退出游戏");
+        buttonQuit.setText("Quit Game");
 
         line_1 = new Line();
         line_1.setEndX(170.0);
