@@ -313,7 +313,7 @@ public class LisenerController extends Thread {
         return false;
     }
 
-    private boolean isGameOver (int player) throws InterruptedException {
+    private boolean isGameOver(int player) throws InterruptedException {
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(i, 0) == player
                     && controller.getChessBoard(i, 1) == player
@@ -379,7 +379,7 @@ public class LisenerController extends Thread {
         }
     }
 
-    private void disconnect () {
+    private void disconnect() {
         send("GAMERQUIT");
     }
 }

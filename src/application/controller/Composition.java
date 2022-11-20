@@ -12,7 +12,7 @@ public class Composition {
         return line;
     }
 
-    public boolean contains (String name) {
+    public boolean contains(String name) {
         return circle.getPlayerName().equals(name) || line.getPlayerName().equals(name);
     }
 

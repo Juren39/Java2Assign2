@@ -40,51 +40,51 @@ public class Controller{
     private Line line_3;
     private Line line_4;
 
-    public double getWidth () {
+    public double getWidth() {
         return Width;
     }
 
-    public double getHeight () {
+    public double getHeight() {
         return Height;
     }
 
-    public int getChessBoard (int i, int j) {
+    public int getChessBoard(int i, int j) {
         return chessBoard[i][j];
     }
 
-    public void setChessBoard (int i, int j, int x) {
+    public void setChessBoard(int i, int j, int x) {
         chessBoard[i][j] = x;
     }
 
-    public Rectangle getGame_panel () {
+    public Rectangle getGame_panel() {
         return game_panel;
     }
 
-    public VBox getGamebox () {
+    public VBox getGamebox() {
         return gamebox;
     }
 
-    public Label getLabelOrder () {
+    public Label getLabelOrder() {
         return labelOrder;
     }
 
-    public Label getLabelWin () {
+    public Label getLabelWin() {
         return labelWin;
     }
 
-    public Label getLabelyou () {
+    public Label getLabelyou() {
         return labelyou;
     }
 
-    public Button getButtonQuit () {
+    public Button getButtonQuit() {
         return buttonQuit;
     }
 
-    public String getRivalName () {
+    public String getRivalName() {
         return rivalName;
     }
 
-    public void setRivalName (String x) {
+    public void setRivalName(String x) {
         rivalName = x;
     }
     public void draw () {
@@ -157,7 +157,7 @@ public class Controller{
 
     }
 
-    void drawCircle (int i, int j) {
+    void drawCircle(int i, int j) {
         Circle circle = new Circle();
         base_square.getChildren().add(circle);
         circle.setCenterX(i * BOUND + BOUND / 2.0 + OFFSET);
@@ -167,7 +167,7 @@ public class Controller{
         circle.setFill(Color.TRANSPARENT);
     }
 
-    void drawLine (int i, int j) {
+    void drawLine(int i, int j) {
         Line line_a = new Line();
         Line line_b = new Line();
         base_square.getChildren().add(line_a);
@@ -185,7 +185,7 @@ public class Controller{
         line_b.setStroke(Color.BLUE);
     }
 
-    void refreshGame () {
+    void refreshGame() {
         base_square.getChildren().clear();
         base_square.getChildren().addAll(game_panel, line_1, line_2, line_3, line_4);
         labelWin.setText("No Winner");

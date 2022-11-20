@@ -31,7 +31,7 @@ public class PlayerController extends Thread{
 
     public void run() {
         String line;
-        while(flag) {
+        while (flag) {
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
@@ -44,11 +44,11 @@ public class PlayerController extends Thread{
             }
             if (line != null) {
                 String[] strs = line.split(":");
-                if(strs[0].equals("LUOZI")) {
+                if (strs[0].equals("LUOZI")) {
                     String name = strs[1];
                     String x = strs[2];
                     String y = strs[3];
-                    for(PlayerController player : players) {
+                    for (PlayerController player : players) {
                         if(player.getPlayerName().equals(name)) {
                             player.send("LUOZI:" + x + ":" + y);
                         }
@@ -155,12 +155,12 @@ public class PlayerController extends Thread{
             }
         }
         synchronized ("aaaa") {
-            if(isCom){
+            if (isCom) {
                 players.remove(player1);
                 players.remove(player2);
-            }else{
-                for(int i=0;i<players.size();i++){
-                    if(players.get(i).getPlayerName().equals(playerName)){
+            } else {
+                for (int i=0;i<players.size();i++) {
+                    if(players.get(i).getPlayerName().equals(playerName)) {
                         players.remove(players.get(i));
                         i--;
                     }
