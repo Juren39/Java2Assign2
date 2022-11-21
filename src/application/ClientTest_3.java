@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class ClientTest_3 extends Application{
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
         try {
             SelectController selectController = new SelectController();
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
@@ -28,7 +28,7 @@ public class ClientTest_3 extends Application{
                 if (result.get() == ButtonType.OK){
                     stage.close();
                     System.exit(0);
-                } else{
+                } else {
                     event.consume();
                 }
             });

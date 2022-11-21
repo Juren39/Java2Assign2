@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class ClientTest_2 extends Application{
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
         try {
             SelectController selectController = new SelectController();
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
@@ -20,7 +20,7 @@ public class ClientTest_2 extends Application{
             stage.setScene(scene);
             stage.setTitle("LINK");
             stage.initStyle(StageStyle.UNIFIED);
-            stage.setOnCloseRequest(event ->{
+            stage.setOnCloseRequest(event -> {
                 Alert alert2 = new Alert(Alert.AlertType.CONFIRMATION);
                 alert2.setTitle("Exit");
                 alert2.setHeaderText("Are you sure to exit");
@@ -28,7 +28,7 @@ public class ClientTest_2 extends Application{
                 if (result.get() == ButtonType.OK){
                     stage.close();
                     System.exit(0);
-                } else{
+                } else {
                     event.consume();
                 }
             });

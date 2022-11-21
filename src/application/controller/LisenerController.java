@@ -1,5 +1,9 @@
 package application.controller;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.Socket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -9,11 +13,8 @@ import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.Socket;
-import java.util.Arrays;
+
+
 
 
 public class LisenerController extends Thread {
@@ -46,7 +47,7 @@ public class LisenerController extends Thread {
         this.name = name;
         this.socket = socket;
         this.selectController = selectController;
-        if (socket != null){
+        if (socket != null) {
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 printStream = new PrintStream(socket.getOutputStream());
@@ -58,12 +59,12 @@ public class LisenerController extends Thread {
 
     public void run() {
         String line = null;
-        while (flag){
+        while (flag) {
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 try {
-                    if(flag){
+                    if (flag) {
                         line = null;
                         close();
                         restart(true);
@@ -74,27 +75,24 @@ public class LisenerController extends Thread {
             }
             if (line != null) {
                 String[] strs = line.split(":");
-                if (strs[0].equals("MATCHWITH")){
+                if (strs[0].equals("MATCHWITH")) {
                     String otherName = strs[1];
                     String order = strs[2];
                     controller.setRivalName(otherName);
-                    Platform.runLater(() ->{
-                        selectController.getSelectPane().getMatchinfo().setText("Match:" + otherName);
-                    });
+                    Platform.runLater(() ->
+                            selectController.getSelectPane().getMatchinfo().setText("Match:" + otherName));
                     selectController.setIsMatch(true);
                     if (order.equals("0")) { //first move
                         controller.getLabelyou().setText("You are Line");
                         controller.getLabelOrder().setText("It's Your Turn");
                         TURN = true;
                         move();
-                    }
-                    else if (order.equals("1")){
+                    } else if (order.equals("1")) {
                         controller.getLabelyou().setText("You are Circle");
                         controller.getLabelOrder().setText("It's Rival Turn");
                         TURN = false;
                     }
-                }
-                else if (strs[0].equals("LUOZI")) {
+                } else if (strs[0].equals("LUOZI")) {
                     int i = Integer.parseInt(strs[1]);
                     int j = Integer.parseInt(strs[2]);
                     boolean vaild;
@@ -108,8 +106,7 @@ public class LisenerController extends Thread {
                             move();
                         }
                     }
-                }
-                else if (strs[0].equals("RESTART")) {
+                } else if (strs[0].equals("RESTART")) {
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
@@ -118,33 +115,29 @@ public class LisenerController extends Thread {
                     String turn = strs[1];
                     if (turn.equals("rival")) {
                         TURN = false;
-                        Platform.runLater(() ->{
+                        Platform.runLater(() -> {
                             controller.refreshGame();
                             controller.getLabelyou().setText("You are Circle");
                             controller.getLabelOrder().setText("It's Rival Turn");
                         });
                     } else {
                         TURN = true;
-                        Platform.runLater(() ->{
+                        Platform.runLater(() -> {
                             controller.refreshGame();
                             controller.getLabelyou().setText("You are Line");
                             controller.getLabelOrder().setText("It's Your Turn");
                         });
                         move();
                     }
-                }
-                else if (strs[0].equals("DISCONNECT")) {
-                    Platform.runLater(() -> {
-                        controller.getLabelOrder().setText("Gamer Quit");
-                    });
+                } else if (strs[0].equals("DISCONNECT")) {
+                    Platform.runLater(() -> controller.getLabelOrder().setText("Gamer Quit"));
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                     restart(false);
-                }
-                else if (strs[0].equals("LINK")) {
+                } else if (strs[0].equals("LINK")) {
                     String statu = strs[1];
                     if (statu.equals("ERROR")) {
                         String error = strs[2];
@@ -159,11 +152,10 @@ public class LisenerController extends Thread {
                         });
                         selectController.setIsLink(true);
                     }
-                }
-                else if (strs[0].equals("QUITMATCH")) {
+                } else if (strs[0].equals("QUITMATCH")) {
                     Platform.runLater(() -> {
-                        if(strs.length == 2){
-                            if(strs[1].equals("Rival")){
+                        if (strs.length == 2) {
+                            if (strs[1].equals("Rival")) {
                                 AlertRival();
                                 selectController.getSelectPane().getLinkinfo().setText("No Link");
                                 selectController.setIsLink(false);
@@ -176,11 +168,9 @@ public class LisenerController extends Thread {
                             selectController.setIsMatch(false);
                         }
                     });
-                }
-                else if (strs[0].equals("MOVEWRONG")) {
+                } else if (strs[0].equals("MOVEWRONG")) {
                     move();
-                }
-                else if (strs[0].equals("QUITGAME")) {
+                } else if (strs[0].equals("QUITGAME")) {
                     try {
                         close();
                         Platform.runLater(() -> {
@@ -220,7 +210,7 @@ public class LisenerController extends Thread {
     }
 
     @FXML
-    protected void AlertServer(){
+    protected void AlertServer() {
         DialogPane dialog = new DialogPane();
         dialog.setHeaderText("????????");
         dialog.setContentText("Server Crash!!!!");
@@ -228,7 +218,7 @@ public class LisenerController extends Thread {
 
     }
 
-    private void restart(boolean Server){
+    private void restart(boolean Server) {
         Stage stage;
         if (selectController.getIsGame()) {
             stage = (Stage) controller.getGamebox().getScene().getWindow();
@@ -241,17 +231,18 @@ public class LisenerController extends Thread {
             selectController.setIsMatch(false);
             selectController.setIsGame(false);
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
-                    selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
+                    selectController.getSelectPane().getPrefWidth(),
+                    selectController.getSelectPane().getPrefHeight());
             stage.setScene(scene);
             stage.setTitle("LINK");
             stage.show();
-            if(Server){
+            if (Server) {
                 AlertServer();
             }
         });
     }
 
-    private void close() throws IOException{
+    private void close() throws IOException {
         flag = false;
         dataInputStream.close();
         printStream.close();
@@ -315,7 +306,7 @@ public class LisenerController extends Thread {
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(i, 0) == player
                     && controller.getChessBoard(i, 1) == player
-                    && controller.getChessBoard(i, 2) == player){
+                    && controller.getChessBoard(i, 2) == player) {
                 AlertClick(player);
                 return true;
             }
@@ -323,20 +314,20 @@ public class LisenerController extends Thread {
         for (int i = 0; i < 3; i++) {
             if (controller.getChessBoard(0, i) == player
                     && controller.getChessBoard(1, i) == player
-                    && controller.getChessBoard(2, i) == player){
+                    && controller.getChessBoard(2, i) == player) {
                 AlertClick(player);
                 return true;
             }
         }
         if (controller.getChessBoard(0, 0) == player
                 && controller.getChessBoard(1, 1) == player
-                && controller.getChessBoard(2, 2) == player){
+                && controller.getChessBoard(2, 2) == player) {
             AlertClick(player);
             return true;
         }
         if (controller.getChessBoard(2, 0) == player
                 && controller.getChessBoard(1, 1) == player
-                && controller.getChessBoard(0, 2) == player){
+                && controller.getChessBoard(0, 2) == player) {
             AlertClick(player);
             return true;
         }

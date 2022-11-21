@@ -1,15 +1,15 @@
 package application.controller;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.DialogPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.Socket;
 
 public class SelectController {
     private Socket socket = null;
@@ -46,11 +46,11 @@ public class SelectController {
 
     public SelectController() {
         selectPane.draw();
-        selectPane.getButtonLink().setOnMouseClicked(e->linkStart());
-        selectPane.getButtonMatch().setOnMouseClicked(e->matchStart());
-        selectPane.getButtonGame().setOnMouseClicked(e->playStart());
-        selectPane.getQuitMatch().setOnMouseClicked(e->quitMatch());
-        selectPane.getQuitGame().setOnMouseClicked(e->quitGame());
+        selectPane.getButtonLink().setOnMouseClicked(e -> linkStart());
+        selectPane.getButtonMatch().setOnMouseClicked(e -> matchStart());
+        selectPane.getButtonGame().setOnMouseClicked(e -> playStart());
+        selectPane.getQuitMatch().setOnMouseClicked(e -> quitMatch());
+        selectPane.getQuitGame().setOnMouseClicked(e -> quitGame());
     }
 
     private void playStart() {
@@ -58,7 +58,8 @@ public class SelectController {
             setIsGame(true);
             Stage stage = (Stage) selectPane.getButtonGame().getScene().getWindow();
             Scene scene = new Scene(lisenerController.getController().getGamebox(),
-                    lisenerController.getController().getWidth(), lisenerController.getController().getHeight());
+                    lisenerController.getController().getWidth(),
+                    lisenerController.getController().getHeight());
             scene.setFill(Color.TRANSPARENT);
             stage.setScene(scene);
             stage.setTitle("Tic Tac Toe");
@@ -90,11 +91,11 @@ public class SelectController {
     }
 
     private void linkStart() {
-        if(socket == null || !isLink) {
+        if (socket == null || !isLink) {
             try {
                 name = selectPane.getTextField().getText();
                 socket = new Socket(InetAddress.getLocalHost(), 8888);
-                printStream =new PrintStream(socket.getOutputStream());
+                printStream = new PrintStream(socket.getOutputStream());
                 lisenerController = new LisenerController(socket, name, this);
                 lisenerController.start();
                 send("LINK:" + name);

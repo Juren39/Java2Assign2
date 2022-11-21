@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
-public class PlayerController extends Thread{
+public class PlayerController extends Thread {
     private final Socket socket;
     private String playerName;
     private int status = 0;
@@ -36,7 +36,7 @@ public class PlayerController extends Thread{
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 try {
-                    if(flag){
+                    if (flag) {
                         line = null;
                         close();
                     }
@@ -50,26 +50,26 @@ public class PlayerController extends Thread{
                     String name = strs[1];
                     String x = strs[2];
                     String y = strs[3];
-                    for (PlayerController player : players){
-                        if(player.getPlayerName().equals(name)){
+                    for (PlayerController player : players) {
+                        if (player.getPlayerName().equals(name)) {
                             player.send("LUOZI:" + x + ":" + y);
                         }
                     }
-                } else if (strs[0].equals("WINNER")){
+                } else if (strs[0].equals("WINNER")) {
                     String name = strs[1];
                     String TURN = strs[2];
-                    for(PlayerController player : players){
-                        if(player.getPlayerName().equals(name)){
-                            if (TURN.equals("true")){
+                    for (PlayerController player : players) {
+                        if (player.getPlayerName().equals(name)) {
+                            if (TURN.equals("true")) {
                                 player.send("RESTART:rival");
                             } else {
                                 player.send("RESTART:you");
                             }
                         }
                     }
-                } else if (strs[0].equals("GAMERQUIT")){
+                } else if (strs[0].equals("GAMERQUIT")) {
                     PlayerController player1 = null, player2 = null;
-                    synchronized ("bbbb"){
+                    synchronized ("bbbb") {
                         for (int j = 0; j < compositions.size(); j++) {
                             if (compositions.get(j).contains(playerName)) {
                                 player1 = compositions.get(j).getCircle();
@@ -83,16 +83,16 @@ public class PlayerController extends Thread{
                             }
                         }
                     }
-                    synchronized ("aaaa"){
+                    synchronized ("aaaa") {
                         players.remove(player1);
                         players.remove(player2);
                     }
-                } else if (strs[0].equals("WANTMATCH")){
+                } else if (strs[0].equals("WANTMATCH")) {
                     setStatus(1);
-                } else if (strs[0].equals("QUITMATCH")){
+                } else if (strs[0].equals("QUITMATCH")) {
                     synchronized ("bbbb") {
-                        for (int j = 0; j < compositions.size(); j++){
-                            if (compositions.get(j).contains(playerName)){
+                        for (int j = 0; j < compositions.size(); j++) {
+                            if (compositions.get(j).contains(playerName)) {
                                 PlayerController player1, player2;
                                 player1 = compositions.get(j).getCircle();
                                 player2 = compositions.get(j).getLine();
@@ -105,9 +105,9 @@ public class PlayerController extends Thread{
                             }
                         }
                     }
-                } else if (strs[0].equals("MOVEWRONG")){
+                } else if (strs[0].equals("MOVEWRONG")) {
                     send("MOVEWRONG");
-                } else if (strs[0].equals("QUITGAME")){
+                } else if (strs[0].equals("QUITGAME")) {
                     try {
                         send("QUITGAME");
                         close();
@@ -116,7 +116,7 @@ public class PlayerController extends Thread{
                     }
 
                 } else if (strs[0].equals("LINK")) {
-                    if(strs.length > 1){
+                    if (strs.length > 1) {
                         String name = strs[1];
                         boolean vaild = true;
                         for (PlayerController playerController : players) {
@@ -163,8 +163,8 @@ public class PlayerController extends Thread{
                 players.remove(player1);
                 players.remove(player2);
             } else {
-                for (int i=0;i<players.size();i++) {
-                    if(players.get(i).getPlayerName().equals(playerName)) {
+                for (int i = 0; i < players.size(); i++) {
+                    if (players.get(i).getPlayerName().equals(playerName)) {
                         players.remove(players.get(i));
                         i--;
                     }
@@ -191,7 +191,7 @@ public class PlayerController extends Thread{
         }
     }
 
-    public void send(String msg){
+    public void send(String msg) {
         printstream.println(msg);
         printstream.flush();
     }

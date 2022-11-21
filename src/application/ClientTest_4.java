@@ -25,7 +25,7 @@ public class ClientTest_4 extends Application {
                 alert2.setTitle("Exit");
                 alert2.setHeaderText("Are you sure to exit");
                 Optional<ButtonType> result = alert2.showAndWait();
-                if (result.get() == ButtonType.OK) {
+                if (result.get() == ButtonType.OK){
                     stage.close();
                     System.exit(0);
                 } else {
