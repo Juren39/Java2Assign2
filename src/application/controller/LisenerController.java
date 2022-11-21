@@ -57,15 +57,17 @@ public class LisenerController extends Thread {
     }
 
     public void run() {
-        String line;
+        String line = null;
         while (flag){
             try {
                 line = dataInputStream.readLine();
             } catch (IOException e) {
                 try {
-                    line = null;
-                    close();
-                    restart(true);
+                    if(flag){
+                        line = null;
+                        close();
+                        restart(true);
+                    }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -95,7 +97,7 @@ public class LisenerController extends Thread {
                 else if (strs[0].equals("LUOZI")) {
                     int i = Integer.parseInt(strs[1]);
                     int j = Integer.parseInt(strs[2]);
-                    boolean vaild = true;
+                    boolean vaild;
                     if (refreshRival(i, j)) {
                         try {
                             vaild = isGameOver(TURN ? PLAY_2 : PLAY_1);
@@ -163,15 +165,17 @@ public class LisenerController extends Thread {
                         if(strs.length == 2){
                             if(strs[1].equals("Rival")){
                                 AlertRival();
+                                selectController.getSelectPane().getLinkinfo().setText("No Link");
+                                selectController.setIsLink(false);
                             }
                         }
                         if (selectController.getIsGame()) {
                             restart(false);
                         } else {
                             selectController.getSelectPane().getMatchinfo().setText("No Match");
+                            selectController.setIsMatch(false);
                         }
                     });
-                    selectController.setIsMatch(false);
                 }
                 else if (strs[0].equals("MOVEWRONG")) {
                     move();
@@ -197,6 +201,11 @@ public class LisenerController extends Thread {
         DialogPane dialog = new DialogPane();
         dialog.setHeaderText("????????");
         dialog.setContentText("Your Rival Quit!!!!!");
+        AlertMode(dialog);
+
+    }
+
+    static void AlertMode(DialogPane dialog) {
         dialog.getButtonTypes().add(ButtonType.YES);
         Stage dialogStage = new Stage();
         Scene dialogScene = new Scene(dialog);
@@ -208,52 +217,41 @@ public class LisenerController extends Thread {
             dialogStage.close();
         });
         dialogStage.show();
-
     }
 
     @FXML
-    protected void AlertServer() {
+    protected void AlertServer(){
         DialogPane dialog = new DialogPane();
         dialog.setHeaderText("????????");
         dialog.setContentText("Server Crash!!!!");
-        dialog.getButtonTypes().add(ButtonType.YES);
-        Stage dialogStage = new Stage();
-        Scene dialogScene = new Scene(dialog);
-        dialogStage.setScene(dialogScene);
-        dialogStage.initStyle(StageStyle.UTILITY);
-        dialogStage.setResizable(false);
-        Button yes = (Button) dialog.lookupButton(ButtonType.YES);
-        yes.setOnAction(event -> {
-            dialogStage.close();
-        });
-        dialogStage.show();
+        AlertMode(dialog);
 
     }
 
-    private void restart(boolean Server) {
+    private void restart(boolean Server){
+        Stage stage;
+        if (selectController.getIsGame()) {
+            stage = (Stage) controller.getGamebox().getScene().getWindow();
+        } else {
+            stage = (Stage) selectController.getSelectPane().getAllbox().getScene().getWindow();
+        }
         Platform.runLater(() -> {
-            if(Server){
-                AlertServer();
-            }
-            Stage stage;
-            if (selectController.getIsGame()) {
-                stage = (Stage) controller.getGamebox().getScene().getWindow();
-            } else {
-                stage = (Stage) selectController.getSelectPane().getAllbox().getScene().getWindow();
-            }
             selectController = new SelectController();
-            selectController.setIsGame(false);
             selectController.getSelectPane().getMatchinfo().setText("No Match");
             selectController.setIsMatch(false);
+            selectController.setIsGame(false);
             Scene scene = new Scene(selectController.getSelectPane().getAllbox(),
                     selectController.getSelectPane().getPrefWidth(), selectController.getSelectPane().getPrefHeight());
             stage.setScene(scene);
             stage.setTitle("LINK");
             stage.show();
+            if(Server){
+                AlertServer();
+            }
         });
     }
 
-    private void close() throws IOException {
+    private void close() throws IOException{
         flag = false;
         dataInputStream.close();
         printStream.close();
